@@ -1,0 +1,8 @@
+css jquery_validation
+defcss jquery_validation
+  .error
+    color red
+
+tpl_macro jquery_validation '_'
+  `js js/jquery-validation/jquery.validate.min.js
+  `js js/jquery-validation/localization/messages_cn.js

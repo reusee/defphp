@@ -1,0 +1,6 @@
+get logout
+  do { setcookie('s', false);
+    setcookie('uid', false);
+    setcookie('auth_type', false);
+    session_destroy();
+  }

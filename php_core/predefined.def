@@ -1,0 +1,119 @@
+import jquery
+import kint
+import form
+import normalize_css
+
+index index
+timezone Asia/Shanghai
+encoding utf-8
+
+template system_header
+  title $title
+  meta http-equiv, Content-Type content, 'text/html; charset=', $Encoding
+  `normalize_css
+  `jquery
+  `js js/global.js
+  `js 'js/page_' {=context('query path')} '_script.js'
+  `css css/global.css
+  `css 'css/page_' {=context('query path')} '_style.css'
+
+page not_found
+template not_found
+  p '- Not Found -'
+
+template default //如果page handler没有定义模板，则默认使用这个
+
+tpl_macro processtime '_'
+  {= 'process time: ', round((microtime(true) - context('start time')) * 1000, 2), 'ms'}
+tpl_macro process_time '_' `processtime
+
+tpl_macro html '_ [head **head] [body **body]'
+  doctype 'html'
+  html
+    head :head:
+    body :body:
+
+tpl_macro system_header '_'
+  `include system_header
+
+tpl_macro refresh '_ *time'
+  meta http-equiv, refresh content, :time:
+
+tpl_macro form '_ *path **res' //form
+  {if (!isset($_GET['haserror'])) {
+    $_SESSION['validation_info'] = array();
+  }}
+  `js js/jquery.cookie.js
+  `js js/jquery.autosave.js
+  form action, [`path :path:] method, post 
+    :res:
+  `if (empty($_SESSION['validation_info']))
+    `js {$(function() {
+      $.fn.autosave.removeAllCookies();
+    })}
+  `js {$(function() {
+    $('form *').autosave();
+    $.fn.autosave.restore();
+  })}
+
+tpl_macro fieldset '_ *legend **res' //fieldset
+  fieldset legend, :legend: :res:
+
+tpl_macro show_error '_ **defs'
+  `if (isset($_SESSION['validation_info'][':name:']))
+    :defs: .error_field
+    `loop ($_SESSION['validation_info'][':name:']) m
+      span .error_message %m
+    `else
+      :defs:
+
+tpl_macro text '_ *name **res' //text
+  `show_error
+    input type, text name, :name: .input_text :res:
+
+tpl_macro password '_ *name **res' //password
+  `show_error
+    input type, password name, :name: .input_password :res:
+
+tpl_macro submit '_ *value **res' //submit
+  input type, submit value, :value: .input_submit :res:
+
+tpl_macro textarea '_ *name **res' //textarea
+  `show_error
+    textarea name, :name: .input_textarea :res:
+
+tpl_macro radio_set '_ *name **res' //radio set
+  `if (isset($_SESSION['validation_info'][':name:']))
+    div .error_field :res:
+      `loop ($_SESSION['validation_info'][':name:']) m
+        span .error_message %m
+    `else
+      div :res:
+
+tpl_macro radio '_ *name *value **res' //radio
+  input type, radio name, :name: value, :value: .input_radio :res:
+
+tpl_macro checkbox '_ *name **res' //checkbox
+  `show_error
+    input type, checkbox name, :name: .input_checkbox :res:
+
+tpl_macro hidden '_ *name *value **res' //hidden
+  input type, hidden name, :name: value, :value: .input_hidden :res:
+
+tpl_macro redirect '_ *target'
+  `hidden 'redirect' :target:
+
+tpl_macro a '_ *text *href **res' //a
+  a :text: href, :href: :res:
+
+tpl_macro clear '_'
+  div .clear
+css predefined
+defcss predefined
+  .clear
+    clear both
+
+  .error_field
+    //border 1px solid red
+  .error_message 
+    color red

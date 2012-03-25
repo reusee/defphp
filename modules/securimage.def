@@ -1,0 +1,2 @@
+tpl_macro captcha '_ **res'
+  img src, 'lib/securimage/securimage_show.php' alt, 'Captcha'

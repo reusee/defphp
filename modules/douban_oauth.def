@@ -1,0 +1,11 @@
+import oauth
+
+get douban_login
+  do
+    douban_oauth
+    douban_login
+
+get douban_oauth_callback
+  do
+    douban_oauth
+    douban_callback
